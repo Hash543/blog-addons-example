@@ -1,11 +1,15 @@
 #include "functionexample.h"
-
+#include "libpixiouvc.h"
+int functionexample::UVCInit(void){
+    // return 9;
+  return LibUVCInit();
+}
+int functionexample::UVCReadButtonStatus(void){
+    // return 8;
+  return LibUVCReadButtonStatus();
+}
 std::string functionexample::hello(){
     return "Hello World";
-}
-
-int functionexample::add(int a, int b){
-  return a + b;
 }
 
 Napi::String functionexample::HelloWrapped(const Napi::CallbackInfo& info) {
@@ -13,24 +17,19 @@ Napi::String functionexample::HelloWrapped(const Napi::CallbackInfo& info) {
     Napi::String returnValue = Napi::String::New(env, functionexample::hello());
     return returnValue;
 }
-
-
-Napi::Number functionexample::AddWrapped(const Napi::CallbackInfo& info) {
+Napi::Number functionexample::UVCInitWrapped(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
-    if (info.Length() < 2 || !info[0].IsNumber() || !info[1].IsNumber()) {
-        Napi::TypeError::New(env, "Number expected").ThrowAsJavaScriptException();
-    } 
-
-    Napi::Number first = info[0].As<Napi::Number>();
-    Napi::Number second = info[1].As<Napi::Number>();
-
-    int returnValue = functionexample::add(first.Int32Value(), second.Int32Value());
-    
+    int returnValue = functionexample::UVCInit();
     return Napi::Number::New(env, returnValue);
 }
-
+Napi::Number functionexample::UVCReadButtonStatusWrapped(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    int returnValue = functionexample::UVCReadButtonStatus();
+    return Napi::Number::New(env, returnValue);
+}
 Napi::Object functionexample::Init(Napi::Env env, Napi::Object exports) {
     exports.Set("hello", Napi::Function::New(env, functionexample::HelloWrapped));
-    exports.Set("add", Napi::Function::New(env, functionexample::AddWrapped));
+    exports.Set("LibUVCInit", Napi::Function::New(env, functionexample::UVCInitWrapped));
+    exports.Set("LibUVCReadButtonStatus", Napi::Function::New(env, functionexample::UVCReadButtonStatusWrapped));
     return exports;
 }
